@@ -1,74 +1,37 @@
 import { useRouter } from "next/router";
+import React, { ForwardRefRenderFunction, MutableRefObject } from "react";
 import { useEffect, useState } from "react";
-
-import { gsap } from 'gsap';
+import { TransitionGroup, CSSTransition, SwitchTransition } from 'react-transition-group';
 
 interface AnimatedRoutingLayoutProperties {
     children: any;
-    mainStyle: string;
+    styles: any;
 }
 
 const AnimatedRoutingLayout = (props: AnimatedRoutingLayoutProperties) => {
 
-  const [animationIsRunning, setAnimationIsRunning] = useState(false);
-
   const router = useRouter();
 
-  useEffect(() => {
-    
-    const className = "." + props.mainStyle;
+  const mainRef = React.useRef<HTMLElement>(null);
 
-    const finish_animation_if_needed = () => {
-      if (!animationIsRunning) {
-        const timeline = gsap.timeline();
-        timeline.to(className, {
-          duration: 0.5,
-          opacity: 1,
-          ease: "Expo.easeInOut",
-          stagger: -0.1,
-        });
-        setAnimationIsRunning(false);
-      }
-    }
-
-    const aniStart = () => {
-      const timeline = gsap.timeline();
-      timeline.to(className, {
-        duration: 0.5,
-        opacity: 0,
-        ease: "Expo.easeInOut",
-        stagger: 0.1,
-        onComplete: () => {
-          setAnimationIsRunning(false);
-          finish_animation_if_needed();
-        }
-      });
-      setAnimationIsRunning(true);
-    };
-    const aniEnd = () => {
-      finish_animation_if_needed();
-    };
-
-    router.events.on('routeChangeStart', aniStart);
-    router.events.on('routeChangeComplete', aniEnd);
-    router.events.on('routeChangeError', aniEnd);
-
-    return () => {
-      router.events.off('routeChangeStart', aniStart);
-      router.events.off('routeChangeComplete', aniEnd);
-      router.events.off('routeChangeError', aniEnd);
-    };
-  }, [router]);
- 
-  const jsx = (
+  return (
     <>
-        <main className={props.mainStyle}>
-            {props.children}
-        </main>
+      <SwitchTransition mode="out-in">
+        
+        <CSSTransition
+          key={router.pathname}
+          in={true}
+          timeout={500}
+          classNames="main"
+          appear={true}
+        >
+          <main ref={mainRef} className={props.styles.main}>
+              {props.children}
+          </main>
+        </CSSTransition>
+      </SwitchTransition>
     </>
-);
-
-return animationIsRunning ? (<></>) : jsx;
+  );
 
 };
 
