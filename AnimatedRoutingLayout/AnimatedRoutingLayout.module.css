@@ -1,0 +1,18 @@
+
+.main_enter, .main_appear {
+    opacity: 0;
+}
+
+.main_enter_active, .main_appear_active {
+    opacity: 1;
+    transition: all 0.5s ease-in-out;
+}
+
+.main_exit {
+    opacity: 1;
+}
+
+.main_exit_active {
+    opacity: 0;
+    transition: all 0.5s ease-in-out;
+}
